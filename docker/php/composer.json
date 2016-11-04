@@ -1,0 +1,17 @@
+{
+  "config": {
+    "bin-dir": "/usr/sbin"
+  },
+  "require": {
+    "robmorgan/phinx": "*",
+    "phpunit/phpunit": "~4.0",
+    "phpunit/dbunit": "~2.0",
+    "squizlabs/php_codesniffer": "~2.5",
+    "phpmd/phpmd": "~2.3",
+    "zendframework/zftool": "dev-master",
+    "zendframework/zend-developer-tools": "1.0.0",
+    "fzaninotto/faker": "~1.5",
+    "zendframework/zend-test": "~2.6",
+    "zfcampus/zf-deploy": "~1.0-dev"
+  }
+}
