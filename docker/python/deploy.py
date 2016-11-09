@@ -71,79 +71,13 @@ class CmwDeploy:
                 self.logger.error('Bastion is missing')
                 sys.exit(128)
 
-            self.get_target()
-            if self.deploy_target is None:
-                self.logger.error('No Deploy target set')
-                sys.exit(128)
-
             self.send_command()
-            self.destroy_instance()
         except (KeyboardInterrupt, SystemExit):
             self.logger.info('Exit')
-            self.destroy_instance(force=True)
             sys.exit(1)
         except:
             self.logger.critical('Exception happened')
-            self.destroy_instance(force=True)
             raise
-
-    def destroy_instance(self, force=False):
-        """Destroys the instance"""
-        if self.ec2 is None or self.deploy_target is None:
-            self.logger.info('No instance to destroy')
-            return
-
-        if self.args.keep is True and force is False:
-            self.logger.info('Not destroying instance')
-            return
-
-        self.logger.info('Terminating instance: %s' % self.deploy_target)
-        self.logger.debug('Initiating Dalek Extermination protocol')
-        self.ec2.meta.client.terminate_instances(InstanceIds=[self.deploy_target])
-        self.logger.info('Instance terminated')
-        self.logger.debug('EXTERMINATE EXTERMINATE!!')
-
-    def get_target(self):
-        """Finds the target to deploy too"""
-        if self.args.target is not None:
-            self.logger.debug('Target set from command line')
-            return self.args.target
-
-        return self.create_instance()
-
-    def create_instance(self):
-        """Creates a new instance to deploy too"""
-        self.logger.info('Creating instance')
-        security_groups = self.args.security_group.split(',')
-        instance = self.ec2.create_instances(
-            ImageId=self.args.ami,
-            MinCount=1,
-            MaxCount=1,
-            KeyName='cmwn',
-            SecurityGroupIds=security_groups,
-            InstanceType='t2.micro',
-            Monitoring={
-                'Enabled': False
-            },
-            InstanceInitiatedShutdownBehavior='terminate',
-            SubnetId=self.args.subnet
-        )
-
-        self.deploy_target = instance[0].id
-
-        instance[0].create_tags(
-            Tags=[
-                {'Key': 'Name', 'Value': '%s Deploy' % (self.args.app[0].upper() + self.args.app[1:])},
-                {'Key': 'Type', 'Value': '%s Build' % (self.args.app[0].upper() + self.args.app[1:])},
-                {'Key': 'Environment', 'Value': self.args.env[0].upper() + self.args.env[1:]},
-                {'Key': 'Web', 'Value': ''},
-                {'Key': 'Php', 'Value': ''}
-            ]
-        )
-
-        self.logger.info('Waiting for %s instance to start' % self.deploy_target)
-        instance[0].wait_until_running()
-        self.logger.debug('Instance in a started state')
 
     def find_instance_by_name(self, instance_name):
         """Checks to see if bastion is alive and running"""
@@ -180,9 +114,6 @@ class CmwDeploy:
             DocumentName="CMWN-Deploy",
             Comment='string',
             Parameters={
-                'deployTo': [
-                    self.deploy_target,
-                ],
                 'version': [
                     self.args.version,
                 ],
