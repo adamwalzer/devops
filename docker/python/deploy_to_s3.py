@@ -156,6 +156,9 @@ class CMWNDeploy(object):
 
         :return:
         """
+        if link is None:
+            return
+
         if link in self.links_ref:
             return self.links_ref[link]
         elif link in self.links_ref.values():
