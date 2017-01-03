@@ -20,7 +20,7 @@ except ImportError:
 try:
     import magic  # Mime type detector
 except ImportError:
-    print ('You are missing boto3.')
+    print ('You are missing magic.')
     print ('to fix run: brew install libmagic')
     print ('then: pip install python-magic')
     sys.exit(1)
@@ -333,7 +333,12 @@ class CMWNDeploy(object):
         """
         dest_file = source_file
 
-        source_mime = magic.from_file(source_file, mime=True)
+        if (sys.platform == 'win32'):
+            m = magic.Magic(magic_file='C:\Program Files (x86)\GnuWin32\share\misc\magic', mime=True)
+            source_mime = m.from_file(source_file)
+        else:
+            source_mime = magic.from_file(source_file, mime=True)
+
         for extension in self.mime_maps:
             if source_file.endswith(extension):
                 source_mime = self.mime_maps[extension]
