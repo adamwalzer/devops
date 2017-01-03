@@ -21,7 +21,6 @@ try:
     have_colorlog = True
 except ImportError:
     have_colorlog = False
-    pass
 
 
 class CmwDeploy:
@@ -40,9 +39,9 @@ class CmwDeploy:
         self.valid_env = ['qa', 'staging', 'production', 'demo', 'lab']
         self.deploy_target = None
 
-        default_ami = os.getenv('AWS_BASE_AMI');
+        default_ami = os.getenv('AWS_BASE_AMI')
         if default_ami is None:
-            default_ami = 'ami-c481fad3' # Base Amazon AMI
+            default_ami = 'ami-c481fad3'  # Base Amazon AMI
 
         # load in arguments
         parser = argparse.ArgumentParser(description='Deploys skribble to to environment', prog='deploy')
@@ -119,6 +118,9 @@ class CmwDeploy:
                 ],
                 'application': [
                     self.args.app
+                ],
+                'env': [
+                    self.args.env
                 ]
             },
             OutputS3BucketName='cmwn-logs',
